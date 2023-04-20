@@ -1,3 +1,8 @@
+<?php
+	require('lib/memo-controleur.lib.php');
+?>
+
+<!DOCTYPE html>
 <html lang="fr">
 
 <head>
@@ -24,55 +29,38 @@
 					class="appli-logo" alt="Memo">
 			</header>
 			<section class="AjoutTache">
-				<form action="index.php" method="post">
-					<input type="text" placeholder="Ajoutez une tâche ..." name="texteTache" autocomplete="off">
+				<form action="index.php?op=ajouter" method="post">
+					<input type="text" placeholder="Ajoutez une tâche ..." name="texteTache" autocomplete="off" autofocus>
 					<button type="submit" class="btn-ajout-tache">></button>
 				</form>
 			</section>
 			<section class="Taches">
-				<!-- Si aucune tâche, afficher le prochain DIV -->
-				<!-- 
+				<?php if(count($taches) == 0) : ?>
 				<div class="msg-aucune-tache">
 					<span class="emoji-anime">💃</span>
-					Wouhou, rien à faire !
+					Rien à afficher
 					<span class="emoji-anime">🕺</span>
 				</div>
-				-->
-
-				<!-- Sinon, afficher les tâches suivant le gabarit ci-dessous -->
-				<!-- Remarquez la classe indiquant une tâche complétée -->
-				<div class="Tache completee">
-					<a class="basculer" href="index.php?op=basculer&idt=20">&#x2713;</a>
+				<?php endif; ?>
+				
+				<?php foreach($taches as $tache) : ?>
+				<div class="Tache<?= $tache['accomplie'] ? ' completee' : ''; ?>">
+					<a class="basculer" href="index.php?op=basculer&idt=<?= $tache['id']; ?>">&#x2713;</a>
 					<div class="infoTache">
-						<span class="texte">Finir le TP#2</span>
-						<span class="date">(19 avril 2023 à 20:52:23)</span>
+						<span class="texte"><?= $tache['texte']; ?></span>
+						<span class="date">(<?= $tache['date_ajout']; ?>)</span>
 					</div>
-					<a class="supprimer" href="index.php?op=supprimer&idt=20">&#x2212;</a>
+					<a class="supprimer" href="index.php?op=supprimer&idt=<?= $tache['id']; ?>">&#x2212;</a>
 				</div>
-				<div class="Tache">
-					<a class="basculer" href="index.php?op=basculer&idt=12">&#x2713;</a>
-					<div class="infoTache">
-						<span class="texte">Voir Il grande silenzio</span>
-						<span class="date">(15 avril 2023 à 17:05:02)</span>
-					</div>
-					<a class="supprimer" href="index.php?op=supprimer&idt=12">&#x2212;</a>
-				</div>
-				<div class="Tache">
-					<a class="basculer" href="index.php?op=basculer&idt=1">&#x2713;</a>
-					<div class="infoTache">
-						<span class="texte">Faire mon rapport d'impôts</span>
-						<span class="date">(22 février 2023 à 12:31:50)</span>
-					</div>
-					<a class="supprimer" href="index.php?op=supprimer&idt=1">&#x2212;</a>
-				</div>
+				<?php endforeach; ?>
 			</section>
 			<footer class="Controle">
 				<div class="filtres">
-					<a class="btn actif" href="#">Toutes</a>
-					<a class="btn" href="#">Complétées</a>
-					<a class="btn" href="#">Actives</a>
+					<a class="btn<?= (!isset($_GET['filtre']) || $_GET['filtre']==2) ? ' actif': ''; ?>" href="index.php?filtre=2">Toutes</a>
+					<a class="btn<?= (isset($_GET['filtre']) && $_GET['filtre']==1) ? ' actif': ''; ?>" href="index.php?filtre=1">Complétées</a>
+					<a class="btn<?= (isset($_GET['filtre']) && $_GET['filtre']==0) ? ' actif': ''; ?>" href="index.php?filtre=0">Actives</a>
 				</div>
-				<span class="compte">2 tâches actives</span>
+				<span class="compte"><?= $nbTachesActives . " " . ($nbTachesActives!=1 ? "tâches actives" : "tâche active") ?></span>
 				<div class="supprimer-completees">
 					<a 
 						class="btn" 
